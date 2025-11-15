@@ -8,6 +8,7 @@ interface BottomPanelProps {
   ads: AdLocation[];
   onClose: () => void;
   onAdClick: (ad: AdLocation) => void;
+  sidePanelRightOffset?: number; // px
 }
 
 function formatPrice(price: number): string {
@@ -34,7 +35,12 @@ function getCategoryColor(category: AdLocation["category"]): string {
   return colors[category] || "#6b7280";
 }
 
-export function BottomPanel({ ads, onClose, onAdClick }: BottomPanelProps) {
+export function BottomPanel({
+  ads,
+  onClose,
+  onAdClick,
+  sidePanelRightOffset = 400,
+}: BottomPanelProps) {
   if (ads.length === 0) return null;
 
   const averagePrice = ads.reduce((sum, ad) => sum + ad.price, 0) / ads.length;
@@ -45,7 +51,7 @@ export function BottomPanel({ ads, onClose, onAdClick }: BottomPanelProps) {
         position: "fixed",
         bottom: 0,
         left: 0,
-        right: "400px",
+        right: `${sidePanelRightOffset}px`,
         height: "400px",
         backgroundColor: "white",
         boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",

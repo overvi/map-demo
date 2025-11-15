@@ -12,7 +12,7 @@ import { MdDraw } from "react-icons/md";
 import type { AdLocation } from "@/types/AdLocation";
 import { pointInPolygon } from "@/utils/pointInPolygon";
 
-const center: LatLngExpression = [48.8566, 2.3522];
+const defaultCenter: LatLngExpression = [48.8566, 2.3522];
 
 const iranBounds: [[number, number], [number, number]] = [
   [24, 44],
@@ -105,7 +105,21 @@ function InitialZoom() {
   return null;
 }
 
-export default function OsmMap() {
+export interface MapProps {
+  showSidePanel?: boolean;
+  showDrawControl?: boolean;
+  initialCenter?: [number, number];
+  initialZoom?: number;
+  bumpInitialZoom?: boolean;
+}
+
+export default function OsmMap({
+  showSidePanel = true,
+  showDrawControl = true,
+  initialCenter,
+  initialZoom,
+  bumpInitialZoom = true,
+}: MapProps) {
   const [drawingEnabled, setDrawingEnabled] = useState(false);
   const [drawnPolygon, setDrawnPolygon] = useState<
     [number, number][] | undefined
@@ -157,15 +171,20 @@ export default function OsmMap() {
     }
   }, [drawingEnabled]);
 
+  const sidePanelWidth = 400;
+  const mapWidth = showSidePanel
+    ? `calc(100% - ${sidePanelWidth}px)`
+    : "100%";
+
   return (
     <div style={{ height: "100vh", width: "100%", position: "relative" }}>
       <MapContainer
-        center={center}
-        zoom={3}
+        center={(initialCenter as LatLngExpression) || defaultCenter}
+        zoom={initialZoom ?? 3}
         minZoom={6}
         maxBounds={iranBounds}
         maxBoundsViscosity={1.0}
-        style={{ height: "100%", width: "calc(100% - 400px)" }}
+        style={{ height: "100%", width: mapWidth }}
         scrollWheelZoom={true}
       >
         <TileLayer
@@ -177,12 +196,14 @@ export default function OsmMap() {
           onBoundsChange={handleBoundsChange}
           onMapReady={handleMapReady}
         />
-        <InitialZoom />
-        <DrawingControl
-          onDrawComplete={handleDrawComplete}
-          drawingEnabled={drawingEnabled}
-          drawnPolygon={drawnPolygon}
-        />
+        {bumpInitialZoom && <InitialZoom />}
+        {showDrawControl && (
+          <DrawingControl
+            onDrawComplete={handleDrawComplete}
+            drawingEnabled={drawingEnabled}
+            drawnPolygon={drawnPolygon}
+          />
+        )}
         <MapActions polygon={drawnPolygon} drawingEnabled={drawingEnabled} />
         <AdsLayer
           ads={ads}
@@ -190,22 +211,25 @@ export default function OsmMap() {
           onMarkerClick={handleMarkerClick}
         />
       </MapContainer>
-      <AdsPanel
-        ads={filteredAds}
-        filterPolygon={drawnPolygon}
-        zoom={zoom}
-        mapBounds={mapBounds}
-        onAdClick={(ad) => {
-          if (mapInstanceRef.current) {
-            mapInstanceRef.current.flyTo([ad.lat, ad.lng], 14);
-          }
-        }}
-      />
-      <button
+      {showSidePanel && (
+        <AdsPanel
+          ads={filteredAds}
+          filterPolygon={drawnPolygon}
+          zoom={zoom}
+          mapBounds={mapBounds}
+          onAdClick={(ad) => {
+            if (mapInstanceRef.current) {
+              mapInstanceRef.current.flyTo([ad.lat, ad.lng], 14);
+            }
+          }}
+        />
+      )}
+      {showDrawControl && (
+        <button
         style={{
           position: "absolute",
           top: "10px",
-          right: "410px",
+          right: showSidePanel ? "410px" : "10px",
           zIndex: 1000,
           padding: "12px",
           backgroundColor: drawingEnabled ? "#dc2626" : "#2563eb",
@@ -225,12 +249,13 @@ export default function OsmMap() {
       >
         <MdDraw />
       </button>
+      )}
       {drawnPolygon && (
         <button
           style={{
             position: "absolute",
             top: "60px",
-            right: "410px",
+            right: showSidePanel ? "410px" : "10px",
             zIndex: 1000,
             padding: "8px 16px",
             backgroundColor: "#6b7280",
@@ -259,6 +284,7 @@ export default function OsmMap() {
               mapInstanceRef.current.flyTo([ad.lat, ad.lng], 15);
             }
           }}
+          sidePanelRightOffset={showSidePanel ? 400 : 0}
         />
       )}
     </div>

@@ -1,13 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { MapProps } from "./Map";
 
-const OsmMap = dynamic(() => import("../components/Map"), {
+const OsmMap = dynamic(() => import("./Map"), {
   ssr: false,
 });
 
-const MapWrapper = () => {
-  return <OsmMap />;
+const MapWrapper = (props: MapProps) => {
+  return <OsmMap {...props} />;
 };
 
 export default MapWrapper;
