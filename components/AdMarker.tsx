@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { AdLocation } from "@/types/AdLocation";
+import { ImageWithLoading } from "./ImageWithLoading";
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("fa-IR").format(Math.round(price));
@@ -74,7 +75,7 @@ export function AdMarker({
     >
       <Popup>
         <div style={{ minWidth: "200px" }}>
-          <img
+          <ImageWithLoading
             src={ad.image}
             alt={ad.title}
             style={{

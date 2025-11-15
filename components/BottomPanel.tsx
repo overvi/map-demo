@@ -2,6 +2,7 @@
 
 import type { AdLocation } from "@/types/AdLocation";
 import { MdClose } from "react-icons/md";
+import { ImageWithLoading } from "./ImageWithLoading";
 
 interface BottomPanelProps {
   ads: AdLocation[];
@@ -145,7 +146,7 @@ export function BottomPanel({ ads, onClose, onAdClick }: BottomPanelProps) {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              <img
+              <ImageWithLoading
                 src={ad.image}
                 alt={ad.title}
                 style={{

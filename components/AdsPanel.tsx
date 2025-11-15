@@ -2,6 +2,7 @@
 
 import type { AdLocation } from "@/types/AdLocation";
 import type L from "leaflet";
+import { ImageWithLoading } from "./ImageWithLoading";
 
 interface AdsPanelProps {
   ads: AdLocation[];
@@ -178,7 +179,7 @@ export function AdsPanel({
                   e.currentTarget.style.transform = "translateY(0)";
                 }}
               >
-                <img
+                <ImageWithLoading
                   src={ad.image}
                   alt={ad.title}
                   style={{
